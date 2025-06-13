@@ -1,6 +1,6 @@
-
 import React, { useState } from 'react';
 import Header from '../components/Header';
+import HeroSlider from '../components/HeroSlider';
 import ProductCard from '../components/ProductCard';
 import Footer from '../components/Footer';
 import { useCart } from '../hooks/useCart';
@@ -76,22 +76,8 @@ const Home = () => {
     <div className="min-h-screen bg-gray-50">
       <Header cartItemsCount={getTotalItems()} />
       
-      {/* Hero Section */}
-      <section className="bg-gradient-to-r from-blue-600 to-blue-800 text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-          <div className="text-center">
-            <h1 className="text-4xl md:text-6xl font-bold mb-4">
-              Os Melhores Produtos
-            </h1>
-            <p className="text-xl md:text-2xl mb-8 text-blue-100">
-              Celulares, tablets e eletrônicos com os melhores preços
-            </p>
-            <button className="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold text-lg hover:bg-gray-100 transition-colors">
-              Ver Ofertas
-            </button>
-          </div>
-        </div>
-      </section>
+      {/* Hero Slider */}
+      <HeroSlider />
 
       {/* Categories */}
       <section className="py-16">
