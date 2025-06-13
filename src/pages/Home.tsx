@@ -1,74 +1,28 @@
-import React, { useState } from 'react';
+
+import React from 'react';
 import Header from '../components/Header';
 import HeroSlider from '../components/HeroSlider';
 import ProductCard from '../components/ProductCard';
 import Footer from '../components/Footer';
 import { useCart } from '../hooks/useCart';
+import { useFeaturedProducts } from '../hooks/useProducts';
+import { useCategories } from '../hooks/useCategories';
 import { toast } from 'sonner';
 
 const Home = () => {
   const { addToCart, getTotalItems } = useCart();
-
-  // Dados mock dos produtos
-  const [products] = useState([
-    {
-      id: '1',
-      name: 'iPhone 15 Pro Max 256GB',
-      price: 8999.99,
-      image: 'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=300&h=300&fit=crop',
-      rating: 4.8,
-      reviews: 1247,
-      category: 'Smartphone'
-    },
-    {
-      id: '2',
-      name: 'Samsung Galaxy S24 Ultra',
-      price: 7499.99,
-      image: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=300&h=300&fit=crop',
-      rating: 4.7,
-      reviews: 892,
-      category: 'Smartphone'
-    },
-    {
-      id: '3',
-      name: 'iPad Pro 12.9" M2',
-      price: 6999.99,
-      image: 'https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=300&h=300&fit=crop',
-      rating: 4.9,
-      reviews: 534,
-      category: 'Tablet'
-    },
-    {
-      id: '4',
-      name: 'MacBook Air M2',
-      price: 12999.99,
-      image: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=300&h=300&fit=crop',
-      rating: 4.8,
-      reviews: 726,
-      category: 'Notebook'
-    },
-    {
-      id: '5',
-      name: 'AirPods Pro 2ª Geração',
-      price: 1899.99,
-      image: 'https://images.unsplash.com/photo-1572569511254-d8f925fe2cbb?w=300&h=300&fit=crop',
-      rating: 4.6,
-      reviews: 1834,
-      category: 'Acessório'
-    },
-    {
-      id: '6',
-      name: 'Apple Watch Series 9',
-      price: 3499.99,
-      image: 'https://images.unsplash.com/photo-1434493789847-2f02dc6ca35d?w=300&h=300&fit=crop',
-      rating: 4.7,
-      reviews: 965,
-      category: 'Smartwatch'
-    }
-  ]);
+  const { data: products, isLoading: productsLoading } = useFeaturedProducts();
+  const { data: categories, isLoading: categoriesLoading } = useCategories();
 
   const handleAddToCart = (product: any) => {
-    addToCart(product);
+    const cartProduct = {
+      id: product.id,
+      name: product.name,
+      price: product.sale_price || product.price,
+      image: product.images?.[0] || 'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=300&h=300&fit=crop',
+      category: product.categories?.name || 'Produto'
+    };
+    addToCart(cartProduct);
     toast.success(`${product.name} adicionado ao carrinho!`);
   };
 
@@ -85,18 +39,40 @@ const Home = () => {
           <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
             Categorias Populares
           </h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {['Smartphones', 'Tablets', 'Notebooks', 'Acessórios'].map((category) => (
-              <div key={category} className="bg-white rounded-lg shadow-md p-6 text-center hover:shadow-lg transition-shadow cursor-pointer">
-                <div className="w-16 h-16 bg-blue-100 rounded-full mx-auto mb-4 flex items-center justify-center">
-                  <span className="text-blue-600 font-bold text-xl">
-                    {category.charAt(0)}
-                  </span>
+          {categoriesLoading ? (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="bg-white rounded-lg shadow-md p-6 text-center animate-pulse">
+                  <div className="w-16 h-16 bg-gray-200 rounded-full mx-auto mb-4"></div>
+                  <div className="h-4 bg-gray-200 rounded mx-auto"></div>
                 </div>
-                <h3 className="font-semibold text-gray-900">{category}</h3>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+              {categories?.map((category) => (
+                <div key={category.id} className="bg-white rounded-lg shadow-md p-6 text-center hover:shadow-lg transition-shadow cursor-pointer">
+                  {category.image_url ? (
+                    <img 
+                      src={category.image_url} 
+                      alt={category.name}
+                      className="w-16 h-16 object-cover rounded-full mx-auto mb-4"
+                    />
+                  ) : (
+                    <div className="w-16 h-16 bg-blue-100 rounded-full mx-auto mb-4 flex items-center justify-center">
+                      <span className="text-blue-600 font-bold text-xl">
+                        {category.name.charAt(0)}
+                      </span>
+                    </div>
+                  )}
+                  <h3 className="font-semibold text-gray-900">{category.name}</h3>
+                  {category.description && (
+                    <p className="text-sm text-gray-600 mt-1">{category.description}</p>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
@@ -106,15 +82,42 @@ const Home = () => {
           <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
             Produtos em Destaque
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {products.map((product) => (
-              <ProductCard
-                key={product.id}
-                product={product}
-                onAddToCart={handleAddToCart}
-              />
-            ))}
-          </div>
+          {productsLoading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {[1, 2, 3, 4, 5, 6].map((i) => (
+                <div key={i} className="bg-white rounded-lg shadow-md overflow-hidden animate-pulse">
+                  <div className="w-full h-64 bg-gray-200"></div>
+                  <div className="p-6">
+                    <div className="h-4 bg-gray-200 rounded mb-2"></div>
+                    <div className="h-4 bg-gray-200 rounded mb-4 w-3/4"></div>
+                    <div className="h-6 bg-gray-200 rounded w-1/2"></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : products && products.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {products.map((product) => (
+                <ProductCard
+                  key={product.id}
+                  product={{
+                    id: product.id,
+                    name: product.name,
+                    price: product.sale_price || product.price,
+                    image: product.images?.[0] || 'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=300&h=300&fit=crop',
+                    rating: 4.5, // Placeholder até implementarmos avaliações
+                    reviews: 0, // Placeholder
+                    category: product.categories?.name || 'Produto'
+                  }}
+                  onAddToCart={handleAddToCart}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12">
+              <p className="text-gray-600">Nenhum produto em destaque encontrado.</p>
+            </div>
+          )}
         </div>
       </section>
 
