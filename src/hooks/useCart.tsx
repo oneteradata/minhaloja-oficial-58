@@ -6,8 +6,6 @@ interface Product {
   name: string;
   price: number;
   image: string;
-  rating: number;
-  reviews: number;
   category: string;
 }
 

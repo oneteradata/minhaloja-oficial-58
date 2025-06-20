@@ -105,8 +105,6 @@ const Home = () => {
                     name: product.name,
                     price: product.sale_price || product.price,
                     image: product.images?.[0] || 'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=300&h=300&fit=crop',
-                    rating: 4.5, // Placeholder até implementarmos avaliações
-                    reviews: 0, // Placeholder
                     category: product.categories?.name || 'Produto'
                   }}
                   onAddToCart={handleAddToCart}

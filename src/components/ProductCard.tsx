@@ -7,8 +7,6 @@ interface Product {
   name: string;
   price: number;
   image: string;
-  rating: number;
-  reviews: number;
   category: string;
 }
 
@@ -44,14 +42,14 @@ const ProductCard = ({ product, onAddToCart }: ProductCardProps) => {
               <Star
                 key={i}
                 className={`h-4 w-4 ${
-                  i < Math.floor(product.rating)
+                  i < 4 // Rating padrão de 4 estrelas
                     ? 'text-yellow-400 fill-current'
                     : 'text-gray-300'
                 }`}
               />
             ))}
           </div>
-          <span className="ml-2 text-sm text-gray-600">({product.reviews})</span>
+          <span className="ml-2 text-sm text-gray-600">(0)</span>
         </div>
         
         <div className="flex items-center justify-between">
