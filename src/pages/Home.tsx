@@ -5,13 +5,13 @@ import HeroSlider from '../components/HeroSlider';
 import ProductCard from '../components/ProductCard';
 import Footer from '../components/Footer';
 import { useCart } from '../hooks/useCart';
-import { useFeaturedProducts } from '../hooks/useProducts';
+import { useProducts } from '../hooks/useProducts';
 import { useCategories } from '../hooks/useCategories';
 import { toast } from 'sonner';
 
 const Home = () => {
   const { addToCart, getTotalItems } = useCart();
-  const { data: products, isLoading: productsLoading } = useFeaturedProducts();
+  const { data: products, isLoading: productsLoading } = useProducts();
   const { data: categories, isLoading: categoriesLoading } = useCategories();
 
   const handleAddToCart = (product: any) => {
@@ -76,11 +76,11 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Featured Products */}
+      {/* All Products */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
-            Produtos em Destaque
+            Todos os Produtos
           </h2>
           {productsLoading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -113,7 +113,7 @@ const Home = () => {
             </div>
           ) : (
             <div className="text-center py-12">
-              <p className="text-gray-600">Nenhum produto em destaque encontrado.</p>
+              <p className="text-gray-600">Nenhum produto encontrado.</p>
             </div>
           )}
         </div>
