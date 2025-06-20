@@ -19,6 +19,13 @@ const HeroSlider = () => {
     }
   };
 
+  const scrollToProducts = () => {
+    const productsSection = document.getElementById('products-section');
+    if (productsSection) {
+      productsSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   React.useEffect(() => {
     if (banners && banners.length > 1) {
       const timer = setInterval(nextSlide, 5000);
@@ -47,6 +54,12 @@ const HeroSlider = () => {
           <p className="text-xl md:text-2xl mb-8">
             Os melhores eletrônicos com preços incríveis
           </p>
+          <button
+            onClick={scrollToProducts}
+            className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold text-lg transition-colors inline-block"
+          >
+            Ver Produtos
+          </button>
         </div>
       </div>
     );
@@ -80,13 +93,13 @@ const HeroSlider = () => {
                     {banner.subtitle}
                   </p>
                 )}
-                {banner.button_text && banner.button_link && (
-                  <a
-                    href={banner.button_link}
+                {banner.button_text && (
+                  <button
+                    onClick={scrollToProducts}
                     className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold text-lg transition-colors inline-block"
                   >
                     {banner.button_text}
-                  </a>
+                  </button>
                 )}
               </div>
             </div>

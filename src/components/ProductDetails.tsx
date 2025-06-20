@@ -126,8 +126,9 @@ const ProductDetails = ({ product, isOpen, onClose, onAddToCart }: ProductDetail
                     id: product.id,
                     name: product.name,
                     price: currentPrice,
-                    image: product.images?.[0] || 'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=300&h=300&fit=crop',
-                    category: product.category || 'Produto'
+                    images: product.images || ['https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=300&h=300&fit=crop'],
+                    category: product.category || 'Produto',
+                    stock: product.stock
                   });
                   onClose();
                 }}
