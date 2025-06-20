@@ -1,8 +1,9 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import Header from '../components/Header';
 import HeroSlider from '../components/HeroSlider';
 import ProductCard from '../components/ProductCard';
+import ProductDetails from '../components/ProductDetails';
 import Footer from '../components/Footer';
 import { useCart } from '../hooks/useCart';
 import { useProducts } from '../hooks/useProducts';
@@ -13,6 +14,8 @@ const Home = () => {
   const { addToCart, getTotalItems } = useCart();
   const { data: products, isLoading: productsLoading } = useProducts();
   const { data: categories, isLoading: categoriesLoading } = useCategories();
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [showProductDetails, setShowProductDetails] = useState(false);
 
   const handleAddToCart = (product: any) => {
     const cartProduct = {
@@ -24,6 +27,16 @@ const Home = () => {
     };
     addToCart(cartProduct);
     toast.success(`${product.name} adicionado ao carrinho!`);
+  };
+
+  const handleViewDetails = (product: any) => {
+    setSelectedProduct(product);
+    setShowProductDetails(true);
+  };
+
+  const handleCloseDetails = () => {
+    setShowProductDetails(false);
+    setSelectedProduct(null);
   };
 
   return (
@@ -107,7 +120,8 @@ const Home = () => {
                     image: product.images?.[0] || 'https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=300&h=300&fit=crop',
                     category: product.categories?.name || 'Produto'
                   }}
-                  onAddToCart={handleAddToCart}
+                  onAddToCart={() => handleAddToCart(product)}
+                  onViewDetails={() => handleViewDetails(product)}
                 />
               ))}
             </div>
@@ -118,6 +132,16 @@ const Home = () => {
           )}
         </div>
       </section>
+
+      {/* Product Details Modal */}
+      {selectedProduct && (
+        <ProductDetails
+          product={selectedProduct}
+          isOpen={showProductDetails}
+          onClose={handleCloseDetails}
+          onAddToCart={handleAddToCart}
+        />
+      )}
 
       <Footer />
     </div>

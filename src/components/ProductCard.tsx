@@ -13,12 +13,16 @@ interface Product {
 interface ProductCardProps {
   product: Product;
   onAddToCart: (product: Product) => void;
+  onViewDetails: (product: any) => void;
 }
 
-const ProductCard = ({ product, onAddToCart }: ProductCardProps) => {
+const ProductCard = ({ product, onAddToCart, onViewDetails }: ProductCardProps) => {
   return (
     <div className="bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 overflow-hidden group">
-      <div className="relative overflow-hidden">
+      <div 
+        className="relative overflow-hidden cursor-pointer"
+        onClick={() => onViewDetails(product)}
+      >
         <img
           src={product.image}
           alt={product.name}
@@ -32,7 +36,10 @@ const ProductCard = ({ product, onAddToCart }: ProductCardProps) => {
       </div>
       
       <div className="p-4">
-        <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">
+        <h3 
+          className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2 cursor-pointer hover:text-blue-600"
+          onClick={() => onViewDetails(product)}
+        >
           {product.name}
         </h3>
         
@@ -57,7 +64,10 @@ const ProductCard = ({ product, onAddToCart }: ProductCardProps) => {
             R$ {product.price.toFixed(2)}
           </div>
           <button
-            onClick={() => onAddToCart(product)}
+            onClick={(e) => {
+              e.stopPropagation();
+              onAddToCart(product);
+            }}
             className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors"
           >
             <ShoppingCart className="h-4 w-4" />

@@ -27,10 +27,51 @@ const Checkout = () => {
     });
   };
 
+  const generateWhatsAppMessage = () => {
+    let message = `Olá! Gostaria de finalizar o seguinte pedido:\n\n`;
+    message += `*DADOS DO CLIENTE:*\n`;
+    message += `Nome: ${formData.name}\n`;
+    message += `Email: ${formData.email}\n`;
+    message += `Telefone: ${formData.phone}\n`;
+    message += `Endereço: ${formData.address}\n\n`;
+    
+    message += `*PRODUTOS:*\n`;
+    items.forEach((item, index) => {
+      message += `${index + 1}. ${item.name}\n`;
+      message += `   Quantidade: ${item.quantity}\n`;
+      message += `   Preço unitário: R$ ${item.price.toFixed(2)}\n`;
+      message += `   Subtotal: R$ ${(item.price * item.quantity).toFixed(2)}\n\n`;
+    });
+    
+    message += `*RESUMO:*\n`;
+    message += `Total de itens: ${getTotalItems()}\n`;
+    message += `Valor total: R$ ${getTotalPrice().toFixed(2)}\n`;
+    message += `Forma de pagamento: ${getPaymentMethodName()}\n\n`;
+    message += `Aguardo confirmação! 😊`;
+    
+    return encodeURIComponent(message);
+  };
+
+  const getPaymentMethodName = () => {
+    switch (formData.paymentMethod) {
+      case 'pix': return 'PIX';
+      case 'credit': return 'Cartão de Crédito';
+      case 'debit': return 'Cartão de Débito';
+      case 'boleto': return 'Boleto Bancário';
+      default: return 'Não informado';
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (items.length === 0) {
+      return;
+    }
+
+    // Validar se todos os campos estão preenchidos
+    if (!formData.name || !formData.email || !formData.phone || !formData.address) {
+      alert('Por favor, preencha todos os campos obrigatórios.');
       return;
     }
 
@@ -52,9 +93,16 @@ const Checkout = () => {
         items: orderItems
       });
 
+      // Gerar mensagem do WhatsApp
+      const whatsappMessage = generateWhatsAppMessage();
+      const whatsappUrl = `https://wa.me/5512981311773?text=${whatsappMessage}`;
+      
+      // Abrir WhatsApp
+      window.open(whatsappUrl, '_blank');
+      
       clearCart();
       
-      // Redirecionar para uma página de confirmação ou sucesso
+      // Redirecionar para home com mensagem de sucesso
       navigate('/', { 
         state: { 
           orderSuccess: true, 
@@ -63,6 +111,7 @@ const Checkout = () => {
       });
     } catch (error) {
       console.error('Erro ao finalizar pedido:', error);
+      alert('Erro ao finalizar pedido. Tente novamente.');
     }
   };
 
@@ -109,7 +158,7 @@ const Checkout = () => {
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Nome Completo
+                  Nome Completo *
                 </label>
                 <input
                   type="text"
@@ -123,7 +172,7 @@ const Checkout = () => {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  E-mail
+                  E-mail *
                 </label>
                 <input
                   type="email"
@@ -137,7 +186,7 @@ const Checkout = () => {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Telefone
+                  Telefone *
                 </label>
                 <input
                   type="tel"
@@ -151,7 +200,7 @@ const Checkout = () => {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Endereço Completo
+                  Endereço Completo *
                 </label>
                 <textarea
                   name="address"
@@ -183,9 +232,12 @@ const Checkout = () => {
               <button
                 type="submit"
                 disabled={createOrderMutation.isPending}
-                className="w-full bg-green-500 hover:bg-green-600 disabled:bg-gray-400 text-white py-3 rounded-lg font-semibold text-lg transition-colors"
+                className="w-full bg-green-500 hover:bg-green-600 disabled:bg-gray-400 text-white py-3 rounded-lg font-semibold text-lg transition-colors flex items-center justify-center space-x-2"
               >
-                {createOrderMutation.isPending ? 'Processando...' : 'Finalizar Pedido'}
+                <Smartphone className="h-5 w-5" />
+                <span>
+                  {createOrderMutation.isPending ? 'Processando...' : 'Finalizar via WhatsApp'}
+                </span>
               </button>
             </form>
           </div>
@@ -238,6 +290,9 @@ const Checkout = () => {
                     {formData.paymentMethod === 'boleto' && 'Boleto Bancário'}
                   </span>
                 </div>
+                <p className="text-xs text-green-600 mt-2">
+                  ✓ Pedido será enviado via WhatsApp para confirmação
+                </p>
               </div>
             </div>
           </div>
