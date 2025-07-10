@@ -2,11 +2,13 @@
 import React, { useState } from 'react';
 import { Package, Users, ShoppingBag, TrendingUp, Plus, Edit, Trash2 } from 'lucide-react';
 import Header from '../components/Header';
+import OrderDetailsModal from '../components/OrderDetailsModal';
 import { useCart } from '../hooks/useCart';
 import { useAdminProducts } from '../hooks/useAdminProducts';
 import { useAdminOrders } from '../hooks/useAdminOrders';
 import { useAdminStats } from '../hooks/useAdminStats';
 import { useCategories } from '../hooks/useCategories';
+import { useOrders } from '../hooks/useOrders';
 import { useToast } from '@/hooks/use-toast';
 import { Toaster } from '@/components/ui/toaster';
 
@@ -19,9 +21,12 @@ const Admin = () => {
   const { orders, loading: ordersLoading, updateOrderStatus } = useAdminOrders();
   const { stats, loading: statsLoading } = useAdminStats();
   const { data: categories = [] } = useCategories();
+  const { data: ordersWithItems } = useOrders();
 
   const [activeTab, setActiveTab] = useState('dashboard');
   const [showProductForm, setShowProductForm] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState<any>(null);
+  const [showOrderDetails, setShowOrderDetails] = useState(false);
   const [newProduct, setNewProduct] = useState({
     name: '',
     price: '',
@@ -53,6 +58,14 @@ const Admin = () => {
       await updateOrderStatus(orderId, newStatus);
     } catch (error) {
       console.error('Error updating order status:', error);
+    }
+  };
+
+  const handleViewOrderDetails = (order: any) => {
+    const orderWithItems = ordersWithItems?.find(o => o.id === order.id);
+    if (orderWithItems) {
+      setSelectedOrder(orderWithItems);
+      setShowOrderDetails(true);
     }
   };
 
@@ -375,11 +388,14 @@ const Admin = () => {
                              <option value="delivered">Entregue</option>
                            </select>
                          </td>
-                         <td className="px-6 py-4">
-                           <button className="text-blue-600 hover:text-blue-700 text-sm">
-                             Ver Detalhes
-                           </button>
-                         </td>
+                          <td className="px-6 py-4">
+                            <button 
+                              onClick={() => handleViewOrderDetails(order)}
+                              className="text-blue-600 hover:text-blue-700 text-sm"
+                            >
+                              Ver Detalhes
+                            </button>
+                          </td>
                        </tr>
                      ))}
                    </tbody>
@@ -398,6 +414,14 @@ const Admin = () => {
           )}
         </div>
       </div>
+      
+      <OrderDetailsModal
+        order={selectedOrder}
+        orderItems={selectedOrder?.order_items || []}
+        isOpen={showOrderDetails}
+        onClose={() => setShowOrderDetails(false)}
+      />
+      
       <Toaster />
     </div>
   );
